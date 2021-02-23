@@ -66,7 +66,7 @@ class EEMConvert( minimalmodbus.Instrument ):
     def get_counter(self, counter: int) -> int:
         """Get current value of counter"""
         self.check_counter(counter)
-        _counter = 26+counter
+        _counter = 27+(counter-1)*2
         return self.read_long(_counter)/self.get_pulse_per_unit(counter)
 
     def set_pulse_per_unit(self, counter: int, value: int) -> None:
@@ -78,7 +78,7 @@ class EEMConvert( minimalmodbus.Instrument ):
     def set_counter(self, counter: int, value: int, number_of_decimals=0) -> None:
         """Set current value of counter"""
         self.check_counter(counter)   
-        self.write_long(26+counter,value)     
+        self.write_long(27+(counter-1)*2,value)     
         return
 
     def get_id(self, counter: int) -> int:
