@@ -1,6 +1,14 @@
 import minimalmodbus
 
-class EEMConvert( minimalmodbus.Instrument ):
+
+def check_counter(counter: int) -> None:
+    """Check if counter address is valid"""
+    if not (1 <= counter <= 4):
+        """raise ValueError(f"Invalid Counter: {counter=}")"""
+        raise ValueError("Invalid Counter: %s" % counter)
+
+
+class EEMConvert(minimalmodbus.Instrument):
     """Instrument class for Honeywell EEM-Converter.
 
     Args:
@@ -16,7 +24,7 @@ class EEMConvert( minimalmodbus.Instrument ):
     def get_firmware(self) -> str:
         """return Firmware Version"""
         return self.read_register(0, 1)
-    
+
     def get_num_registers(self) -> int:
         """Number of supported registers"""
         return self.read_register(1, 0)
@@ -24,7 +32,7 @@ class EEMConvert( minimalmodbus.Instrument ):
     def get_baudrate(self) -> int:
         """Baudrate [BPS]"""
         return self.read_long(3)
-    
+
     def get_type(self) -> str:
         """type"""
         return self.read_string(6, 5)
@@ -49,44 +57,38 @@ class EEMConvert( minimalmodbus.Instrument ):
         """Modbus Address"""
         return self.read_register(23, 0)
 
-    def check_counter(self, counter: int) -> None:
-        """Check if counter address is valid"""
-        if not (1<=counter<=4):
-            """raise ValueError(f"Invalid Counter: {counter=}")"""
-            raise ValueError("Invalid Counter: %s" % counter)
-
     def get_pulse_per_unit(self, counter: int) -> int:
         """Impulses per unit"""
-        self.check_counter(counter)
-        pulse = self.read_register(34+counter)
-        if (pulse==0):
-            pulse=1
+        check_counter(counter)
+        pulse = self.read_register(34 + counter)
+        if pulse == 0:
+            pulse = 1
         return pulse
 
     def get_counter(self, counter: int) -> int:
         """Get current value of counter"""
-        self.check_counter(counter)
-        _counter = 27+(counter-1)*2
-        return self.read_long(_counter)/self.get_pulse_per_unit(counter)
+        check_counter(counter)
+        _counter = 27 + (counter - 1) * 2
+        return self.read_long(_counter) / self.get_pulse_per_unit(counter)
 
     def set_pulse_per_unit(self, counter: int, value: int) -> None:
         """Set impulses per Unit"""
-        self.check_counter(counter)   
-        self.write_register(34+counter,value)     
+        check_counter(counter)
+        self.write_register(34 + counter, value)
         return
-    
-    def set_counter(self, counter: int, value: int, number_of_decimals=0) -> None:
+
+    def set_counter(self, counter: int, value: int) -> None:
         """Set current value of counter"""
-        self.check_counter(counter)   
-        self.write_long(27+(counter-1)*2,value)     
+        check_counter(counter)
+        self.write_long(27 + (counter - 1) * 2, value)
         return
 
     def get_id(self, counter: int) -> int:
         """User defined id of counter"""
-        self.check_counter(counter)   
-        return self.read_register(38+counter,0)  
+        check_counter(counter)
+        return self.read_register(38 + counter, 0)
 
-    def set_id(self, counter:int, value:int) -> None:
+    def set_id(self, counter: int, value: int) -> None:
         """Set user defined id of counter"""
-        self.check_counter(counter)   
-        self.write_register(38+counter,value)                
+        check_counter(counter)
+        self.write_register(38 + counter, value)
