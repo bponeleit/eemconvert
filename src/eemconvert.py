@@ -17,8 +17,9 @@ class EEMConvert(minimalmodbus.Instrument):
 
     """
 
-    def __init__(self, portname, slaveaddress) -> None:
+    def __init__(self, portname, slaveaddress, parity='E') -> None:
         minimalmodbus.Instrument.__init__(self, portname, slaveaddress)
+        self.serial.parity = parity
         return
 
     def get_firmware(self) -> str:
