@@ -38,7 +38,7 @@ class Watermeter:
 
     def __str__(self) -> str:
         water = {"Total": self.convert.get_counter(self.meterid), "Type": self.watertype.name}
-        data = {"Time": datetime.now(), "WATER": water}
+        data = {"Time": datetime.utcnow(), "WATER": water}
         return json.dumps(data)
 
 
